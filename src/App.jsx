@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Formulario from './components/Formulario'
+import Resultado from './components/Resultado'
 
 import imagenCripto from './img/imagen-criptos.png'
 
@@ -43,8 +44,28 @@ const Heading = styled.h1`
 
 
 function App() {
+
+  const [monedas, setMonedas] = useState({});
+  const [resultado, setResultado] = useState({});
   
-  
+  useEffect(()=>{
+    if(Object.keys(monedas).length > 0){
+        // console.log(monedas);
+        const cotizadorCripto = async()=>{
+
+          const  {moneda, criptoMoneda} = monedas;
+
+          const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptoMoneda}&tsyms=${moneda}`;
+          // console.log(url);
+          const respuesta = await fetch(url);
+          const resultado = await respuesta.json();
+
+          setResultado(resultado.DISPLAY[criptoMoneda][moneda])
+        }
+        cotizadorCripto();
+    }
+
+  },[monedas])
 
   return (
     <Contenedor>
@@ -54,7 +75,15 @@ function App() {
       />
       <div>
         <Heading>Coti Crip</Heading>
-        <Formulario/>
+        <Formulario
+          setMonedas={setMonedas}
+        />
+
+        {resultado.PRICE && 
+        <Resultado
+          resultado={resultado}
+        />}
+
       </div>
       
     </Contenedor>
