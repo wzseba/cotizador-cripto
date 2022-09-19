@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { useState, useEffect } from 'react'
 import Formulario from './components/Formulario'
 import Resultado from './components/Resultado'
+import Spinner from './components/Spinner'
 
 import imagenCripto from './img/imagen-criptos.png'
 
@@ -47,11 +48,14 @@ function App() {
 
   const [monedas, setMonedas] = useState({});
   const [resultado, setResultado] = useState({});
+  const [cargando, setCargando] = useState(false);
   
   useEffect(()=>{
     if(Object.keys(monedas).length > 0){
         // console.log(monedas);
         const cotizadorCripto = async()=>{
+          setCargando(true);
+          setResultado({});
 
           const  {moneda, criptoMoneda} = monedas;
 
@@ -60,7 +64,8 @@ function App() {
           const respuesta = await fetch(url);
           const resultado = await respuesta.json();
 
-          setResultado(resultado.DISPLAY[criptoMoneda][moneda])
+          setResultado(resultado.DISPLAY[criptoMoneda][moneda]);
+          // setCargando(false);
         }
         cotizadorCripto();
     }
@@ -78,12 +83,9 @@ function App() {
         <Formulario
           setMonedas={setMonedas}
         />
-
-        {resultado.PRICE && 
-        <Resultado
-          resultado={resultado}
-        />}
-
+        {cargando && <Spinner/>}
+        {resultado.PRICE && <Resultado resultado={resultado}/>}
+        
       </div>
       
     </Contenedor>
